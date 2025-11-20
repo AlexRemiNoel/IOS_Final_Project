@@ -43,21 +43,23 @@ struct LibraryView: View {
                     ContentUnavailableView("No Music", systemImage: "music.note", description: Text("Import MP3 files using the + button."))
                 } else {
                     ForEach(library.tracks) { track in
-                        Button {
-                            player.play(track: track)
-                        } label: {
-                            HStack {
-                                Image(systemName: "music.note")
-                                VStack(alignment: .leading) {
-                                    Text(track.title)
-                                    if let d = track.duration { Text(Self.format(d)).font(.caption).foregroundStyle(.secondary) }
-                                }
-                                Spacer()
-                                if player.currentTrack?.id == track.id && player.isPlaying {
-                                    Image(systemName: "waveform.and.magnifyingglass")
-                                        .foregroundStyle(.blue)
-                                }
+                        HStack {
+                            Image(systemName: "music.note")
+                            VStack(alignment: .leading) {
+                                Text(track.title)
+                                if let d = track.duration { Text(Self.format(d)).font(.caption).foregroundStyle(.secondary) }
                             }
+                            Spacer()
+                            if player.currentTrack?.id == track.id && player.isPlaying {
+                                Image(systemName: "waveform.and.magnifyingglass")
+                                    .foregroundStyle(.blue)
+                            }
+                            Button(action: { player.play(track: track) }) {
+                                Image(systemName: "play.circle.fill")
+                                    .font(.title3)
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel("Play")
                         }
                     }
                 }
@@ -103,22 +105,58 @@ struct PlaylistsView: View {
         NavigationStack {
             List {
                 ForEach(library.playlists) { playlist in
-                    HStack {
-                        NavigationLink(playlist.name) {
-                            PlaylistDetailView(playlist: playlist)
+                    HStack(spacing: 12) {
+                        Image(systemName: "music.note.list")
+                            .font(.system(size: 28, weight: .semibold))
+                            .foregroundStyle(.tint)
+                            .frame(width: 36, height: 36)
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            NavigationLink {
+                                PlaylistDetailView(playlist: playlist)
+                            } label: {
+                                Text(playlist.name)
+                                    .font(.headline)
+                                    .foregroundStyle(.primary)
+                            }
+
+                            let count = library.tracks(in: playlist).count
+                            Text("\(count) song\(count == 1 ? "" : "s")")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
                         }
+
                         Spacer()
+
                         Button(action: {
                             if let first = library.tracks(in: playlist).first {
                                 player.play(track: first)
                             }
                         }) {
                             Image(systemName: "play.circle.fill")
-                                .font(.title3)
+                                .font(.title2)
                         }
                         .buttonStyle(.plain)
                         .accessibilityLabel("Play")
+
+                        Menu {
+                            Button(role: .destructive) {
+                                if let idx = library.playlists.firstIndex(where: { $0.id == playlist.id }) {
+                                    library.deletePlaylists(at: IndexSet(integer: idx))
+                                }
+                            } label: {
+                                Label("Delete Playlist", systemImage: "trash")
+                            }
+                        } label: {
+                            Image(systemName: "ellipsis.circle")
+                                .font(.title2)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Options")
                     }
+                    .padding(.vertical, 10)
+                    .listRowInsets(EdgeInsets(top: 12, leading: 16, bottom: 12, trailing: 16))
+                    .contentShape(Rectangle())
                 }
                 .onDelete(perform: library.deletePlaylists)
             }
@@ -213,14 +251,20 @@ struct NowPlayingView: View {
                     HStack(spacing: 32) {
                         Button(action: { player.togglePlayPause() }) {
                             Image(systemName: player.isPlaying ? "pause.circle.fill" : "play.circle.fill")
+                                .symbolRenderingMode(.monochrome)
+                                .foregroundStyle(.primary)
                                 .font(.system(size: 56))
                         }
+                        .buttonStyle(.plain)
                         .accessibilityLabel(player.isPlaying ? "Pause" : "Play")
 
-                        Button(role: .destructive, action: { player.stop() }) {
+                        Button(action: { player.stop() }) {
                             Image(systemName: "stop.circle.fill")
+                                .symbolRenderingMode(.monochrome)
+                                .foregroundStyle(.primary)
                                 .font(.system(size: 40))
                         }
+                        .buttonStyle(.plain)
                         .accessibilityLabel("Stop")
                     }
                 }
