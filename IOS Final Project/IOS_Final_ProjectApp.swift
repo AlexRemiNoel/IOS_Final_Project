@@ -5,7 +5,7 @@
 //  Created by macuser on 2025-11-06.
 //
 
-import SwiftUI
+public import SwiftUI
 
 @main
 struct IOS_Final_ProjectApp: App {
@@ -15,3 +15,4 @@ struct IOS_Final_ProjectApp: App {
         }
     }
 }
+

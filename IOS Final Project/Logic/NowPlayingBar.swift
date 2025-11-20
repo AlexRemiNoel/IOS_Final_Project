@@ -1,4 +1,4 @@
-import SwiftUI
+public import SwiftUI
 
 public struct NowPlayingBar: View {
     // Content
@@ -45,7 +45,7 @@ public struct NowPlayingBar: View {
             if showsProgress {
                 ProgressView(value: progress)
                     .progressViewStyle(.linear)
-                    .tint(.accentColor)
+                    .tint(Color.accentColor)
                     .padding(.horizontal)
                     .padding(.top, 8)
             }
@@ -163,3 +163,4 @@ private struct NowPlayingBarPreviewHost: View {
 #Preview("NowPlayingBar") {
     NowPlayingBarPreviewHost()
 }
+

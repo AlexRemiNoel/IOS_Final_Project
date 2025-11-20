@@ -7,6 +7,7 @@
 
 import Foundation
 import AVFoundation
+import Combine
 
 @MainActor
 final class PlayerViewModel: ObservableObject {
@@ -67,3 +68,4 @@ final class PlayerViewModel: ObservableObject {
         }
     }
 }
+
